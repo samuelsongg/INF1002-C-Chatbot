@@ -43,7 +43,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "chat1002.h"
-
+#include <windows.h>
 
 /*
  * Get the name of the chatbot.
@@ -52,7 +52,7 @@
  */
 const char *chatbot_botname() {
 
-	return "Chatbot";
+	return "Bob";
 
 }
 
@@ -136,7 +136,7 @@ int chatbot_do_exit(int inc, char *inv[], char *response, int n) {
 
 	snprintf(response, n, "Goodbye!");
 
-	return 1;
+	return 0;
 
 }
 
@@ -153,10 +153,14 @@ int chatbot_do_exit(int inc, char *inv[], char *response, int n) {
  */
 int chatbot_is_load(const char *intent) {
 
-	/* to be implemented */
-
-	return 0;
-
+	if (compare_token(intent, "load") == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
 }
 
 
@@ -172,7 +176,9 @@ int chatbot_is_load(const char *intent) {
 int chatbot_do_load(int inc, char *inv[], char *response, int n) {
 
 	/* to be implemented */
-
+    LPCSTR ini = "C:\\INF1002_Group Project Assignment_Sample.ini";
+    char returnValue[100];
+    //GetPrivateProfileString("")
 	return 0;
 
 }
@@ -190,10 +196,14 @@ int chatbot_do_load(int inc, char *inv[], char *response, int n) {
  */
 int chatbot_is_question(const char *intent) {
 
-	/* to be implemented */
-
-	return 0;
-
+	if (compare_token(intent, "what") == 0 || compare_token(intent, "where") == 0 || compare_token(intent, "who") == 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 
@@ -231,10 +241,14 @@ int chatbot_do_question(int inc, char *inv[], char *response, int n) {
  */
 int chatbot_is_reset(const char *intent) {
 
-	/* to be implemented */
-
-	return 0;
-
+    if(compare_token(intent, "reset") == 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 
@@ -249,7 +263,9 @@ int chatbot_is_reset(const char *intent) {
  */
 int chatbot_do_reset(int inc, char *inv[], char *response, int n) {
 
-	/* to be implemented */
+    knowledge_reset();
+    printf("Chatbot reset")
+    /* to be implemented */
 
 	return 0;
 
@@ -268,10 +284,14 @@ int chatbot_do_reset(int inc, char *inv[], char *response, int n) {
  */
 int chatbot_is_save(const char *intent) {
 
-	/* to be implemented */
-
-	return 0;
-
+    if (compare_token(intent, "save") == 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 
