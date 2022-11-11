@@ -1,0 +1,25 @@
+# depslib dependency file v1.0
+1667920416 source:c:\users\65972\documents\visual studio 2022\inf1002workspace\inf1002_cproject_grp12\chatbot.c
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<ctype.h>
+	"chat1002.h"
+
+1668150832 c:\users\65972\documents\visual studio 2022\inf1002workspace\inf1002_cproject_grp12\chat1002.h
+	<stdio.h>
+
+1668145300 source:c:\users\65972\documents\visual studio 2022\inf1002workspace\inf1002_cproject_grp12\knowledge.c
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	"chat1002.h"
+
+1667894386 source:c:\users\65972\documents\visual studio 2022\inf1002workspace\inf1002_cproject_grp12\main.c
+	<ctype.h>
+	<stdarg.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"chat1002.h"
+
