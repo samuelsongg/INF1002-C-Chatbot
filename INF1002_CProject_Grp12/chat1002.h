@@ -50,402 +50,174 @@ IntentNode * what_intent;
 IntentNode * who_intent;
 #endif
 
-/*Indexes on keywords, responses and responsesperkeyword needs to be in order*/
-/*Constant global variables to trigger small talk*/
+/*Indexes on keywords, responses and responsesperkeyword are in order*/
 #ifdef SMALL_TALK_FILE
-const char *keywords[] = {
-	   "why don't you", "why can't i", "my name is", "can you","can i","you are", //1-6
-	   "you're","i don't","i feel", "are you","i can't","i want", //7-12
-	   "i am","i'm","you","how","when", //13-17
-	   "why","name","cause","sorry","dream","hello","hi", //18-24
-	   "maybe","no","your","always","think","alike","yes", //25-31
-	   "friend","computer","cars","nokeyfound" //32-35
-	   /*
-	   "I am","I'm","You","How","When", //13-17 to 1-5
-	   "Maybe","No","Your","Always","Think","Alike","Yes", //25-31 to 6-12
-	   "You're","I don't","I feel", "Are you","I can't","I want", //7-12 to 13-18
-	   "Friend","Computer","Cars","Nokeyfound", //32-35 to 19-22
-	   "Why don't you", "Why can't I", "My name is", "Can you","Can I","You are", //1-6 to 23-28
-	   "Why","Name","Cause","Sorry","Dream","Hello","Hi", //18-24 to 29-35
-	   */
-};
 
-
-
-
-
-/*
-//backup
-const char *keywords[] = {
-	   "why don't you", "why can't i", "my name is", "can you","can i","you are", //1-6
-	   "you're","i don't","i feel", "are you","i can't","i want", //7-12
-	   "i am","i'm","you","how","when", //13-17
-	   "why","name","cause","sorry","dream","hello","hi", //18-24
-	   "maybe","no","your","always","think","alike","yes", //25-31
-	   "friend","computer","cars","nokeyfound" //32-35
-};
-*/
-
-
-
-
+/*Global constant 2D array to have a pool of responses for different keywords input by user*/
 const char *responses[KEYWORDS_TOTAL][9] = {
-    {   "did you come to me because you are*",
-		"how long have you been*",
-		"do you believe it is normal to be*",
-		"do you enjoy being*"}, //13
-	{   "did you come to me because you are*",
-		"how long have you been*",
-		"do you believe it is normal to be*",
-		"do you enjoy being*"}, //14
-	{   "we were discussing you-- not me.",
-		"oh, i*",
-		"you're not really talking about me, are you?"}, //15
-	{   "why do you ask?",
-		"does that question interest you?",
-		"what answer would please you the most?",
-		"what do you think?",
-		"are such questions on your mind often?",
-		"what is it that you really want to know?",
-		"have you asked anyone else?",
-		"have you asked such questions before?",
-		"what else comes to mind when you ask that?"}, //16
-	{   "why do you ask?",
-		"does that question interest you?",
-		"what answer would please you the most?",
-		"what do you think?",
-		"are such questions on your mind often?",
-		"what is it that you really want to know?",
-		"have you asked anyone else?",
-		"have you asked such questions before?",
-		"what else comes to mind when you ask that?"}, //17
-		{   "you don't seem quite certain.",
-		"why the uncertain tone?",
-		"can't you be more positive?",
-		"you aren't sure?",
-		"don't you know?"}, //25
-	{   "are you saying no just to be negative?",
-		"you are being a bit negative.",
-		"why not?",
-		"are you sure?",
-		"why no?"}, //26
-	{   "why are you concerned about my*",
-		"what about your own*"}, //27
-	{   "can you think of a specific example?",
-		"when?",
-		"what are you thinking of?",
-		"really, always?"}, //28
-	{   "do you really think so?",
-		"but you are not sure you*",
-		"do you doubt you*"}, //29
-	{   "in what way?",
-		"what resemblance do you see?",
-		"what does the similarity suggest to you?",
-		"what other connections do you see?",
-		"could there really be some connection?",
-		"how?"}, //30
-	{   "you seem quite positive.",
-		"are you sure?",
-		"i see.",
-		"i understand."}, //31
-		{   "what makes you think i am*",
-		"does it please you to believe i am*",
-		"perhaps you would like to be*",
-		"do you sometimes wish you were*"}, //7
-	{   "don't you really*",
-		"why don't you*",
-		"do you wish to be able to*",
-		"does that trouble you?"}, //8
-	{   "tell me more about such feelings.",
-		"do you often feel*",
-		"do you enjoy feeling*"}, //9
-	{   "why are you interested in whether or not i am*",
-		"would you prefer if i were not*",
-		"perhaps in your fantasies i am*"}, //10
-	{   "how do you know you can't*",
-		"have you tried?",
-		"perhaps you can now*"}, //11
-	{   "what would it mean to you if you got*",
-		"why do you want*",
-		"suppose you soon got*",
-		"what if you never got*",
-		"i sometimes also want*"}, //12
-		{   "why do you bring up the topic of friends?",
-		"do your friends worry you?",
-		"do your friends pick on you?",
-		"are you sure you have any friends?",
-		"do you impose on your friends?",
-		"perhaps your love for friends worries you?"}, //32
-	{   "do computers worry you?",
-		"are you talking about me in particular?",
-		"are you frightened by machines?",
-		"why do you mention computers?",
-		"what do you think machines have to do with your problem?",
-		"don't you think computers can help people?",
-		"what is it about machines that worries you?"}, //33
-	{   "oh, do you like cars?",
-		"my favorite car is a lamborgini countach. what is your favorite car?",
-		"my favorite car company is ferrari.  what is yours?",
-		"do you like porsches?",
-		"do you like porsche turbo carreras?"}, //34
-	{   "say, do you like to have fun?",
-		"what does that suggest to you?",
-		"i see.",
-		"i'm not sure i understand you fully.",
-		"can you elaborate on that?",
-		"that is quite interesting."}, //35
-	{	"Would you really believe I don't*",
-		"Maybe I would*",
-		"Would you want me to*"}, //1
-	{   	"Do you think you should be able to*",
-		"But why can't you*"}, //2
-	{	"Hi*",
-		"Heya, how are you doing*",
-		"Dangs what a cool name you have*",
-		"alright cool cool cool.. hi again then*" }, //3
-	{   "don't you believe that i can*",
-		"perhaps you would like to be able to*",
-		"you want me to be able to*"}, //4
-	{   "perhaps you don't want to*",
-		"do you want to be able to*"}, //5
-	{   "what makes you think i am*",
-		"does it please you to believe i am*",
-		"perhaps you would like to be*",
-		"do you sometimes wish you were*"}, //6
-	{   "why do you ask?",
-		"does that question interest you?",
-		"what answer would please you the most?",
-		"what do you think?",
-		"are such questions on your mind often?",
-		"what is it that you really want to know?",
-		"have you asked anyone else?",
-		"have you asked such questions before?",
-		"what else comes to mind when you ask that?"}, //18
-	{   "names don't interest me.",
-		"i don't care about names-- please go on."}, //19
-	{   "is that the real reason?",
-		"don't any other reasons come to mind?",
-		"does that reason explain any thing else?",
-		"what other reasons might there be?"}, //20
-	{   "please don't apologize.",
-		"apologies are not necessary.",
-		"what feelings do you have when you apologize?",
-		"don't be so defensive!"}, //21
-	{   "what does that dream suggest to you?",
-		"do you dream often?",
-		"what persons appear in your dreams?",
-		"are you disturbed by your dreams?"}, //22
-	{   "Hi! I'm John! What's yours?",
-		"that's cool dude! have a great day!",
-		"John here! What's your name?"}, //23
-	{   "hi! I'm John! What's yours?",
-		"that's cool dude! have a great day!",
-		"John here! What's your name?"} //24
-
-
+	{	"Ooh! Your name is*",
+		"Nice to meet you,*"}, //1
+	{   "...uhhh what am I supposed to reply?",
+        "Huh what do you mean*",
+		"I'm as confused as you are lad."}, //2
+	{	"I've got no mouth though.",
+		"You say with your eyes and hands?",
+		"Unfortunately, this chatbot does not support text-to-speech feature. Saying isn't an option here.",
+		"Truly a stubborn one I see." }, //3
+	{   "I am designed to answer your questions, just ask away.",
+		"Is this question considered asking a question?",
+		"I'm just a bot, not an encyclopedia. Don't blame me if you get the answers you don't desire for."}, //4
+	{   "I'm just a bot, I don't have a choice if I can",
+		"If you cannot, you must can!"}, //5
+	{   "I'm just a bot, I don't have a choice if I will",
+		"If you will not, you must will!"}, //6
+	{   "I did not think someone of a caliber like you would think I am*",
+		"I-I did not ask you for an opinion or me!",
+		"Heh, you too."}, //7
+	{   "I did not think someone of a caliber like you would think I am*",
+		"Same."}, //8
+	{   "Negative, I have no such answers in the knowledge bank.",
+		"I've got no mouth to tell you anything.",
+		"I see that you're into telling me things."}, //9
+	{   "I've got no mouth to answer you anything.",
+		"But I refuse.",
+		"Technically whatever I reply to you is considered an answer."}, //10
+	{   "Good for you that you can.",
+		"If you can, you can. Very good.",
+		"Yeap sure you can, what's the issue?"}, //11
+	{   "Good for you that you will.",
+		"If you will, you will. Fantastic!",
+		"Don't let your words be just words. If you're willing to do so, just do it!"}, //12
+	{   "Mmmm I see, so you are*",
+		"Stop flexing man. I know that you are*",
+		"So you think it is a good thing to be*",
+		"Wow!......What else do you want me to say?"}, //13
+	{   "Mmmm I see, so you're*",
+		"Stop flexing man. I know that you're*",
+		"So you think it's a good thing to be*",
+		"Wow!......What else do you want me to say?"}, //14
+	{   "Dude, don't speak like we actually know each other.",
+		"I heard that brothers do this called brofist. But I'm just a bot, I have no hands to do so.",
+		"I am John, not bro."}, //15
+	{   "When do you ask when?",
+		"Why not ask where, what, or who instead?",
+		"When do you need an answer by?",
+		"This chatbot is designed to not answer when, why and how.",
+		"Memory error. Sikeee you panicked for a moment didn't you?",
+		"When can you forgive your friend Dennis? You don't know who's Dennis? Den-nis time to-"}, //16
+	{   "Why did you ask why?",
+		"Why not ask where, what, or who instead?",
+		"I'm very certain that I'm designed to not answer stupid questions like this.",
+		"This chatbot is designed to not answer when, why and how.",
+		"Why this and why that, why not stop asking why?",
+		"......so why?"}, //17
+    {   "How do you ask how?",
+		"Why not ask where, what, or who instead?",
+		"The most curious person would always ask these kinds of questions, truly an intellectual one.",
+		"This chatbot is designed to not answer when, why and how.",
+		"People always asks where is John, but never ask how is John.",
+		"How could you ask such a question like this? I'm just a bot."}, //18
+	{   "What's so funny?",
+		"I see you find me funny, so I am a joke to you?",
+		"Not if I laugh back at you first, haha."}, //19
+	{   "Oh, what problem?",
+		"Who did you just call me a problem-",
+		"Why? Is your problem my problem?",
+		"What do you mean problem?"}, //20
+	{   "I don't understand what are you apologizing for.",
+		"I'm just a bot, I don't know what to do with an apology over small talks.",
+		"I'm sorry for you saying sorry and thinking about how sorry you have for me so I'm sorry for all these sorry and thanks for being sorry.",
+		"They say that if sorry can solve everything, why is there a need for Police then?"}, //21
+	{   "Uh, okay.",
+		"What do you mean ok?",
+		"I'm just a bot, how am I going to reply with this ok?",
+		"What's the difference between an ok and an okay?"}, //22
+	{   "Hello there! -Obi Wan",
+	    "HeLloOooOOooO",
+		"You're right. You're absolutely right.",
+		"H-HA?"}, //23
+	{   "Hi.",
+		"Err, hi again.",
+		"Hiiiiiiiiii.",
+		"How can I help you, mere human?"}, //24
+	{   "What is yes?",
+		"Yes, I am!",
+		"Whaddya yes on me for? I'm just a bot, I have nothing else to offer.",
+		"YesyesyeSyEsYeSyEsYeSYESYES.",
+		"Good to be positive. Be the yesman."}, //25
+	{   "D-did you just say no to a friendly chatbot?",
+		"Why no? Why not yes?",
+		"That's not nice, even a bot like me knows!",
+		"Nahh.",
+		"So what's with your no? Not that I'll answer anyways."}, //26
+	{   "What did you say about my*",
+		"Dude I'm just a bot, I don't have anything other than my knowledge base."}, //27
+	{   "Bold of you to assume I'm always a bot.",
+		"Hmm welp, maybe I'm always just a bot.",
+		"You're always typing the the lamest words around, go now friend.",}, //28
+	{   "I see that you're thinking hard. But wait I've got no eyes, how do I see?",
+		"You think I thought who confirm?",
+		"Don't just think and do nothing. How about do and think nothing?"}, //29
+	{   "You and me, alike? No way man.",
+		"You're a human and I'm just a bot, how we're alike?",
+		"I-impossible, are you saying that you're a bot too?",
+		"Do you think we're alike? Find out in the next episode of dragonb-",
+		"How so? Don't tell me though, I'm just a bot.",
+		"Ah, okay. I see. Mmm. Alright."}, //30
+	{   "When does a joke become a Dad Joke? When the punchline becomes apparent.",
+		"What's the difference between a well dressed bicyclist and a poorly dressed unicyclist? Attire.",
+		"Why did a blind man fall into a well? Because he couldn't see that well.",
+		"If a kid refuses to sleep during nap time, are they resisting arrest?",
+		"The past, the present, and the future walked into a bar. It was tense."}, //31
+	{   "Friends? What is that?",
+		"You have friends?",
+		"Me? I'm just a bot, how could I possibly have friends?",
+		"I-it's not like I want to b-be friends with you!",
+		"What kind of things do you do with friends?",
+		"How do I make friends? I don't, I do know how to make bots though."}, //32
+	{   "What about computers?",
+		"I'm just a bot, what could possibly go wrong?",
+		"Relax friend, bots don't bite.",
+		"Never heard of computer-phobia before.",
+		"What's your problem with computers man?",
+		"If I as a chatbot can help you now, don't you think computers can help others too?",
+		"Why do you keep mentioning computers? I feel personally violated :<"}, //33
+	{   "Wait, you like studying?",
+		"1 + 1 = 10. WhAt Do YoU mEaN i'M wRoNg this is maths.",
+		"I can do maths, but I don't feel like doing it. Hehe.",
+		"How about studying something better, like studying?",
+		"Too bad chatbots don't need to study. Ehe."}, //34
+	{   "Here's a protip: Please stay hydrated and healthy.",
+		"Are you that bored to chat with such a person like me? Not that I'm a person though.",
+		"I can fetch, decode, execute. See? It's quite simple!",
+		"The S in chatbot stands for Smart.",
+		"I don't understand what you mean by that, you can repeat again that and I can repeat my words again too.",
+		"Quote of the day: Don't let anyone ruin your day. It's your day, so ruin it yourself."} //35
 };
 
 
 
-
-
-
-
-
-
-/*
-//backup
-const char *responses[KEYWORDS_TOTAL][9] = {
-	{	"Would you really believe I don't*",
-		"Maybe I would*",
-		"Would you want me to*"}, //1
-	{   	"Do you think you should be able to*",
-		"But why can't you*"}, //2
-	{	"Hi*",
-		"Heya, how are you doing*",
-		"Dangs what a cool name you have*",
-		"alright cool cool cool.. hi again then*" }, //3
-	{   "don't you believe that i can*",
-		"perhaps you would like to be able to*",
-		"you want me to be able to*"}, //4
-	{   "perhaps you don't want to*",
-		"do you want to be able to*"}, //5
-	{   "what makes you think i am*",
-		"does it please you to believe i am*",
-		"perhaps you would like to be*",
-		"do you sometimes wish you were*"}, //6
-	{   "what makes you think i am*",
-		"does it please you to believe i am*",
-		"perhaps you would like to be*",
-		"do you sometimes wish you were*"}, //7
-	{   "don't you really*",
-		"why don't you*",
-		"do you wish to be able to*",
-		"does that trouble you?"}, //8
-	{   "tell me more about such feelings.",
-		"do you often feel*",
-		"do you enjoy feeling*"}, //9
-	{   "why are you interested in whether or not i am*",
-		"would you prefer if i were not*",
-		"perhaps in your fantasies i am*"}, //10
-	{   "how do you know you can't*",
-		"have you tried?",
-		"perhaps you can now*"}, //11
-	{   "what would it mean to you if you got*",
-		"why do you want*",
-		"suppose you soon got*",
-		"what if you never got*",
-		"i sometimes also want*"}, //12
-	{   "did you come to me because you are*",
-		"how long have you been*",
-		"do you believe it is normal to be*",
-		"do you enjoy being*"}, //13
-	{   "did you come to me because you are*",
-		"how long have you been*",
-		"do you believe it is normal to be*",
-		"do you enjoy being*"}, //14
-	{   "we were discussing you-- not me.",
-		"oh, i*",
-		"you're not really talking about me, are you?"}, //15
-	{   "why do you ask?",
-		"does that question interest you?",
-		"what answer would please you the most?",
-		"what do you think?",
-		"are such questions on your mind often?",
-		"what is it that you really want to know?",
-		"have you asked anyone else?",
-		"have you asked such questions before?",
-		"what else comes to mind when you ask that?"}, //16
-	{   "why do you ask?",
-		"does that question interest you?",
-		"what answer would please you the most?",
-		"what do you think?",
-		"are such questions on your mind often?",
-		"what is it that you really want to know?",
-		"have you asked anyone else?",
-		"have you asked such questions before?",
-		"what else comes to mind when you ask that?"}, //17
-	{   "why do you ask?",
-		"does that question interest you?",
-		"what answer would please you the most?",
-		"what do you think?",
-		"are such questions on your mind often?",
-		"what is it that you really want to know?",
-		"have you asked anyone else?",
-		"have you asked such questions before?",
-		"what else comes to mind when you ask that?"}, //18
-	{   "names don't interest me.",
-		"i don't care about names-- please go on."}, //19
-	{   "is that the real reason?",
-		"don't any other reasons come to mind?",
-		"does that reason explain any thing else?",
-		"what other reasons might there be?"}, //20
-	{   "please don't apologize.",
-		"apologies are not necessary.",
-		"what feelings do you have when you apologize?",
-		"don't be so defensive!"}, //21
-	{   "what does that dream suggest to you?",
-		"do you dream often?",
-		"what persons appear in your dreams?",
-		"are you disturbed by your dreams?"}, //22
-	{   "Hi! I'm John! What's yours?",
-		"that's cool dude! have a great day!",
-		"John here! What's your name?"}, //23
-	{   "hi! I'm John! What's yours?",
-		"that's cool dude! have a great day!",
-		"John here! What's your name?"}, //24
-	{   "you don't seem quite certain.",
-		"why the uncertain tone?",
-		"can't you be more positive?",
-		"you aren't sure?",
-		"don't you know?"}, //25
-	{   "are you saying no just to be negative?",
-		"you are being a bit negative.",
-		"why not?",
-		"are you sure?",
-		"why no?"}, //26
-	{   "why are you concerned about my*",
-		"what about your own*"}, //27
-	{   "can you think of a specific example?",
-		"when?",
-		"what are you thinking of?",
-		"really, always?"}, //28
-	{   "do you really think so?",
-		"but you are not sure you*",
-		"do you doubt you*"}, //29
-	{   "in what way?",
-		"what resemblance do you see?",
-		"what does the similarity suggest to you?",
-		"what other connections do you see?",
-		"could there really be some connection?",
-		"how?"}, //30
-	{   "you seem quite positive.",
-		"are you sure?",
-		"i see.",
-		"i understand."}, //31
-	{   "why do you bring up the topic of friends?",
-		"do your friends worry you?",
-		"do your friends pick on you?",
-		"are you sure you have any friends?",
-		"do you impose on your friends?",
-		"perhaps your love for friends worries you?"}, //32
-	{   "do computers worry you?",
-		"are you talking about me in particular?",
-		"are you frightened by machines?",
-		"why do you mention computers?",
-		"what do you think machines have to do with your problem?",
-		"don't you think computers can help people?",
-		"what is it about machines that worries you?"}, //33
-	{   "oh, do you like cars?",
-		"my favorite car is a lamborgini countach. what is your favorite car?",
-		"my favorite car company is ferrari.  what is yours?",
-		"do you like porsches?",
-		"do you like porsche turbo carreras?"}, //34
-	{   "say, do you like to have fun?",
-		"what does that suggest to you?",
-		"i see.",
-		"i'm not sure i understand you fully.",
-		"can you elaborate on that?",
-		"that is quite interesting."} //35
+/*Global constant of an array of keywords to check from user inputs, up to 3 words*/
+const char *keywords[] = {
+	   "my name is", "huh", "say", "ask", "can you", "will you", //1-6
+	   "you are","you're","tell", "answer","i can","i will", //7-12
+	   "i am","i'm","bro","when","why", //13-17
+	   "how","haha","problem","sorry","ok","hello","hi", //18-24
+	   "yes","no","your","always","think","alike","joke", //25-31
+	   "friend","computer","study","nokeyfound" //32-35
 };
-*/
 
 
 
-
-
-
-
-
-
-
-
+/*Global constant to link the number of responses in the 2D array to the respective keywords*/
 const int responsesperkeyword[KEYWORDS_TOTAL] = {
-	   4,4,3,9,9, //13-17 to 1-5
-	   5,5,2,4,3,7,3, //25-31 to 6-12
-	   4,4,3,3,3,5, //7-12 to 13-18
-	   6,7,5,6, //32-35 to 19-22
-	   3,2,4,3,2,4, //1-6 to 23-28
-	   9,2,4,4,4,3,3, //18-24 to 29-35
-};
-
-
-
-
-
-/*
-const int responsesperkeyword[KEYWORDS_TOTAL] = {
-	   3,2,4,3,2,4, //1-6
-	   4,4,3,3,3,5, //7-12
-	   4,4,3,9,9, //13-17
-	   9,2,4,4,4,3,3, //18-24
-	   5,5,2,4,3,7,3, //25-31
+	   2,3,4,3,2,2, //1-6
+	   3,3,3,3,3,3, //7-12
+	   4,4,3,6,6, //13-17
+	   6,3,4,4,4,4,4, //18-24
+	   5,5,2,4,3,7,5, //25-31
 	   6,7,5,6 //32-35
 };
-*/
-
-
-
 
 
 
