@@ -75,7 +75,7 @@ const char *chatbot_username() {
 
 
 /*
- * Get a response to user input.
+ * Get a answer to user input.
  *
  * See the comment at the top of the file for a description of how this
  * function is used.
@@ -84,26 +84,26 @@ const char *chatbot_username() {
  *   0, if the chatbot should continue chatting
  *   1, if the chatbot should stop (i.e. it detected the EXIT intent)
  */
-int chatbot_main(int inc, char *inv[], char *response, int n) {
+int chatbot_main(int numofwords, char *inv[], char *answer, int n) {
 
 	/* check for empty input */
-	if (inc < 1) {
-		snprintf(response, n, "");
+	if (numofwords < 1) {
+		snprintf(answer, n, "");
 		return 0;
 	}
 	/* look for an intent and invoke the corresponding do_* function */
 	if (chatbot_is_exit(inv[0]))
-		return chatbot_do_exit(inc, inv, response, n);
+		return chatbot_do_exit(numofwords, inv, answer, n);
 	else if (chatbot_is_load(inv[0]))
-		return chatbot_do_load(inc, inv, response, n);
+		return chatbot_do_load(numofwords, inv, answer, n);
 	else if (chatbot_is_question(inv[0]))
-        return  chatbot_do_question(inc, inv, response, n);
+        return  chatbot_do_question(numofwords, inv, answer, n);
 	else if (chatbot_is_reset(inv[0]))
-		return chatbot_do_reset(inc, inv, response, n);
+		return chatbot_do_reset(numofwords, inv, answer, n);
 	else if (chatbot_is_save(inv[0]))
-		return chatbot_do_save(inc, inv, response, n);
+		return chatbot_do_save(numofwords, inv, answer, n);
 	else {
-		return chatbot_do_smalltalk(inc, inv, response, n);
+		return chatbot_do_smalltalk(numofwords, inv, answer, n);
 	}
 
 }
@@ -135,9 +135,9 @@ int chatbot_is_exit(const char *intent) {
  * Returns:
  *   0 (the chatbot always continues chatting after a question)
  */
-int chatbot_do_exit(int inc, char *inv[], char *response, int n) {
+int chatbot_do_exit(int numofwords, char *inv[], char *answer, int n) {
 
-	snprintf(response, n, "Goodbye!");
+	snprintf(answer, n, "Goodbye!");
 
 	return 1;
 
@@ -176,21 +176,21 @@ int chatbot_is_load(const char *intent) {
  * Returns:
  *   0 (the chatbot always continues chatting after loading knowledge)
  */
-int chatbot_do_load(int inc, char *inv[], char *response, int n) {
+int chatbot_do_load(int numofwords, char *inv[], char *answer, int n) {
 
-	FILE* fptr;
-	int num_of_lines = 0;
+	FILE* fileptr;
+	int numoflines = 0;
 
-	if ((fptr = fopen(inv[1], "r")) == NULL) {// If input file cannot be found, it's NULL
-		snprintf(response, n, "%s not found. Please try again!", inv[1]);
+	if ((fileptr = fopen(inv[1], "r")) == NULL) {// If input file cannot be found, it's NULL
+		snprintf(answer, n, "%s not found. Please try again!", inv[1]);
 	}
 	else { // If file can be found
-		num_of_lines = knowledge_read(fptr);
-		if (num_of_lines == -1) {// If there are invalid input in file
-			snprintf(response, n, "Invalid file.");
+		numoflines = knowledge_read(fileptr);
+		if (numoflines == -1) {// If there are invalid input in file
+			snprintf(answer, n, "Invalid file.");
 		}
 		else {// Valid input in files
-			snprintf(response, n, "Read %d responses from %s", num_of_lines, inv[1]);
+			snprintf(answer, n, "Read %d responses from %s", numoflines, inv[1]);
 		}
 	}
 	return 0;
@@ -233,19 +233,19 @@ int chatbot_is_question(const char *intent) {
  * Returns:
  *   0 (the chatbot always continues chatting after a question)
  */
-int chatbot_do_question(int inc, char *inv[], char *response, int n) {
+int chatbot_do_question(int numberofwords, char *inv[], char *answer, int n) {
 
-	//create crafted response string
-	char * crafted_response = calloc(n, sizeof(char));
-    char * response_temp = calloc(n, sizeof(char));
+	//create crafted answer string
+	char * crafted_answer = calloc(n, sizeof(char));
+    char * answer_temp = calloc(n, sizeof(char));
 	// check for heap overflow
-	if (crafted_response == NULL) {
+	if (crafted_answer == NULL) {
 		printf("Out of memory.\n");
 		exit(1);
 	}
 
 	// create the entity object - array of strings
-	char ** entity = (char **) calloc(inc - 2, sizeof(char *));
+	char ** entity = (char **) calloc(numberofwords - 2, sizeof(char *));
 
 	// check for heap overflow
 	if (entity == NULL) {
@@ -262,7 +262,7 @@ int chatbot_do_question(int inc, char *inv[], char *response, int n) {
 
 
 
-        for (int i = 0; i < inc - 2; i++) { //taking all the values after entity [is]
+        for (int i = 0; i < numberofwords - 2; i++) { //taking all the values after entity [is]
 
 
             int length_of_str = strlen(inv[i + 2]) + 1;
@@ -292,24 +292,24 @@ int chatbot_do_question(int inc, char *inv[], char *response, int n) {
 
 
         //gets return value from knowledge bank
-        int knowledge_return = knowledge_get(inv[0], f_entity, response, n);
+        int knowledge_return = knowledge_get(inv[0], f_entity, answer, n);
         switch (knowledge_return) {
             case KB_NOTFOUND: //if cannot find intent
-                strcat(response_temp, chatbot_botname());
-                strcat(response_temp, ": I don't know."); //copy values to buffer
-                for (int i = 0; i < inc; i++) {
-                    strcat(response_temp, " ");
-                    strcat(response_temp, inv[i]);
+                strcat(answer_temp, chatbot_botname());
+                strcat(answer_temp, ": I don't know."); //copy values to buffer
+                for (int i = 0; i < numberofwords; i++) {
+                    strcat(answer_temp, " ");
+                    strcat(answer_temp, inv[i]);
                 }
-                strcat(response_temp, "?");
-				printf("%s",response_temp);
+                strcat(answer_temp, "?");
+				printf("%s",answer_temp);
 
 
 
-              int kout = knowledge_put(inv[0],f_entity,response,n);
+              int kout = knowledge_put(inv[0],f_entity,answer,n);
 
-                strcat(crafted_response, "Thank you"); //copy values to buffer
-                snprintf(response, n, "%s", crafted_response);
+                strcat(crafted_answer, "Thank you"); //copy values to buffer
+                snprintf(answer, n, "%s", crafted_answer);
                 return kout;
 
 
@@ -323,8 +323,8 @@ int chatbot_do_question(int inc, char *inv[], char *response, int n) {
 
         return 0;
     }else{
-		strcat(crafted_response, "Please include is/are in your question."); //copy values to buffer
-		snprintf(response, n, "%s", crafted_response); //put this to response
+		strcat(crafted_answer, "Please include is/are in your question."); //copy values to buffer
+		snprintf(answer, n, "%s", crafted_answer); //put this to response
 
 		return 0;
 	}
@@ -365,11 +365,11 @@ int chatbot_is_reset(const char *intent) {
  * Returns:
  *   0 (the chatbot always continues chatting after beign reset)
  */
-int chatbot_do_reset(int inc, char *inv[], char *response, int n) {
+int chatbot_do_reset(int numofwords, char *inv[], char *answer, int n) {
 
 	knowledge_reset();
 	// Return print statement
-	snprintf(response, n, "%s reset!", chatbot_botname());
+	snprintf(answer, n, "%s reset!", chatbot_botname());
 
 
 	return 0;
@@ -409,7 +409,7 @@ int chatbot_is_save(const char *intent) {
  * Returns:
  *   0 (the chatbot always continues chatting after saving knowledge)
  */
-int chatbot_do_save(int inc, char *inv[], char *response, int n) {
+int chatbot_do_save(int numofwords, char *inv[], char *answer, int n) {
 
 	// int inc = number of words in user input = FILENAME
 	// char *inv[] = pointers to the beginning of each word of input = pointer to FILENAME
@@ -443,15 +443,15 @@ int chatbot_do_save(int inc, char *inv[], char *response, int n) {
 	if (what_intent->next != NULL || who_intent->next != NULL || where_intent->next != NULL) {
 		f = fopen(filename, "w");
 		if (f == NULL) {
-			snprintf(response, n, "Error opening file");
+			snprintf(answer, n, "Error opening file");
 			return 0;
 		}
 		knowledge_write(f);
-		snprintf(response, n, "My knowledge has been saved to %s", filename);
+		snprintf(answer, n, "My knowledge has been saved to %s", filename);
 		fclose(f);
 	}
 	else {
-		snprintf(response, n, "Knowledge base is empty! Please try again!");
+		snprintf(answer, n, "Knowledge base is empty! Please try again!");
 		return 0;
 	}
 }
@@ -468,7 +468,7 @@ int chatbot_do_save(int inc, char *inv[], char *response, int n) {
  *   0, if the chatbot should continue chatting
  *   1, if the chatbot ran out of responses for some reason (and should theoretically never come here)
  */
-int chatbot_do_smalltalk(int inc, char *inv[], char *response, int n) {
+int chatbot_do_smalltalk(int numofwords, char *inv[], char *answer, int n) {
 
 	/* Initialize local variables to be used*/
 	int index_of_word; //index of word found in inv
@@ -480,52 +480,52 @@ int chatbot_do_smalltalk(int inc, char *inv[], char *response, int n) {
 		exit(1);
 	}
 
-	//create crafted response string
-	char * crafted_response = calloc(n, sizeof(char));
+	//create crafted answer string
+	char * crafted_answer = calloc(n, sizeof(char));
 
 	// check for heap overflow
-	if (crafted_response == NULL) {
+	if (crafted_answer == NULL) {
 		printf("Out of memory.\n");
 		exit(1);
 	}
 
 	/* create temp input to put to lowercase in order to match with chatbot words */
-	char ** temp_input = (char **)calloc(inc, sizeof(char *));
+	char ** temporary_input = (char **)calloc(numofwords, sizeof(char *));
 
-	for (int word_index = 0; word_index < inc; word_index++) { //iterate through to put all to words to lower case
-		temp_input[word_index] = (char *)calloc(30, sizeof(char)); //allocate memory for individual strings (max value 30)
-		strncpy(temp_input[word_index], inv[word_index], 30); //copy inv value to temp_input
+	for (int word_index = 0; word_index < numofwords; word_index++) { //iterate through to put all to words to lower case
+		temporary_input[word_index] = (char *)calloc(30, sizeof(char)); //allocate memory for individual strings (max value 30)
+		strncpy(temporary_input[word_index], inv[word_index], 30); //copy inv value to temp_input
 		for (int char_index = 0; char_index < strlen(inv[word_index]); char_index++) {
-			temp_input[word_index][char_index] = tolower(temp_input[word_index][char_index]); //lowercase
+			temporary_input[word_index][char_index] = tolower(temporary_input[word_index][char_index]); //lowercase
 		}
 	}
 
-	memcpy(returnarray, findpos(inc, temp_input), sizeof(int)*2); //copy the results from findpos to return array
+	memcpy(returnarray, findpos(numofwords, temporary_input), sizeof(int)*2); //copy the results from findpos to return array
 	index_of_word = returnarray[0];
 	index_of_keyword = returnarray[1];
 
-	strncpy(crafted_response, responses[index_of_keyword][replycount[index_of_keyword] % responsesperkeyword[index_of_keyword]], n);
+	strncpy(crafted_answer, responses[index_of_keyword][replycount[index_of_keyword] % responsesperkeyword[index_of_keyword]], n);
 	// copies the response based on keyword to crafted response
 
-	if (crafted_response[strlen(crafted_response) - 1] == '*') {
+	if (crafted_answer[strlen(crafted_answer) - 1] == '*') {
 		// strip * from the response
-		crafted_response[strcspn(crafted_response, "*")] = 0;
+		crafted_answer[strcspn(crafted_answer, "*")] = 0;
 
 		// swaps all other words with appropriate responses
-		for (int after_keyword = index_of_word + 1; after_keyword < inc; after_keyword++) { //iterate through rest of words
+		for (int after_keyword = index_of_word + 1; after_keyword < numofwords; after_keyword++) { //iterate through rest of words
 			for (int swap_index = 0; swap_index < SWAP_TOTAL; swap_index++) { //iterate through swap list
-				if (strcmp(temp_input[after_keyword], swaps[swap_index][0]) == 0) {
-					temp_input[after_keyword] = (char *)swaps[swap_index][1]; //swap word
+				if (strcmp(temporary_input[after_keyword], swaps[swap_index][0]) == 0) {
+					temporary_input[after_keyword] = (char *)swaps[swap_index][1]; //swap word
 				}
 			}
-			strcat(crafted_response, " ");
-			strcat(crafted_response, temp_input[after_keyword]); //formats and puts word into crafted response
+			strcat(crafted_answer, " ");
+			strcat(crafted_answer, temporary_input[after_keyword]); //formats and puts word into crafted response
 		}
 
 	}
 
 
-	snprintf(response, n, "%s", crafted_response); //put this to response
+	snprintf(answer, n, "%s", crafted_answer); //put this to response
 
 	replycount[index_of_keyword]++; //increment to get a different response from same category
 
@@ -544,7 +544,7 @@ int chatbot_do_smalltalk(int inc, char *inv[], char *response, int n) {
  * Returns:
  *   int *, position of word and position of keyword
  */
-int * findpos(int inc, char ** temp_input) {
+int * findpos(int numofwords, char ** temporary_input) {
 
 	//creates local variables for this function
 	int index_of_keyword = KEYWORDS_TOTAL - 1;
@@ -559,7 +559,7 @@ int * findpos(int inc, char ** temp_input) {
 	returnarray[1] = index_of_keyword;
 
 	for (int keyword_index = 0; keyword_index < KEYWORDS_TOTAL; keyword_index++) {
-		for (int word_index = 0; word_index < inc; word_index++) {
+		for (int word_index = 0; word_index < numofwords; word_index++) {
 
 			//create string to checked with for 2 words
 			char * two_chk_string = calloc(30, sizeof(char));
@@ -581,20 +581,20 @@ int * findpos(int inc, char ** temp_input) {
 
 			//if there can be phrase of 2 words formed, combine them together
 			int max_index_two = word_index + 2; //check if a phrase of 2 char from point of index will not exceed word array range
-			if (max_index_two < inc) {
-				strncpy(two_chk_string, temp_input[word_index], sizeof(temp_input[word_index]));
+			if (max_index_two < numofwords) {
+				strncpy(two_chk_string, temporary_input[word_index], sizeof(temporary_input[word_index]));
 				strcat(two_chk_string, " ");
-				strcat(two_chk_string, temp_input[word_index + 1]);
+				strcat(two_chk_string, temporary_input[word_index + 1]);
 			}
 
 			//if there can be phrase of 3 words formed, combine them together
 			int max_index_three = word_index + 3; //check if a phrase of 3 char from point of index will not exceed word array range
-			if (max_index_three < inc) {
-				strncpy(three_chk_string, temp_input[word_index], sizeof(temp_input[word_index]));
+			if (max_index_three < numofwords) {
+				strncpy(three_chk_string, temporary_input[word_index], sizeof(temporary_input[word_index]));
 				strcat(three_chk_string, " ");
-				strcat(three_chk_string, temp_input[word_index + 1]);
+				strcat(three_chk_string, temporary_input[word_index + 1]);
 				strcat(three_chk_string, " ");
-				strcat(three_chk_string, temp_input[word_index + 2]);
+				strcat(three_chk_string, temporary_input[word_index + 2]);
 			}
 
 			if (strcmp(three_chk_string, keywords[keyword_index]) == 0) { //if there are a list of 3 words in inv that matches a hardcoded keyword
@@ -607,7 +607,7 @@ int * findpos(int inc, char ** temp_input) {
 				returnarray[1] = keyword_index;
 				return returnarray;
 			}
-			else if (strcmp(temp_input[word_index], keywords[keyword_index]) == 0) { //if there is a word in inv that matches a hardcoded keyword
+			else if (strcmp(temporary_input[word_index], keywords[keyword_index]) == 0) { //if there is a word in inv that matches a hardcoded keyword
 				returnarray[0] = word_index;
 				returnarray[1] = keyword_index;
 				return returnarray;

@@ -35,13 +35,13 @@
  *   KB_NOTFOUND, if no response could be found
  *   KB_INVALID, if 'intent' is not a recognised question word
  */
-int knowledge_get(const char *intent, char *entity, char *response, int n) {
+int knowledge_get(const char *intent, char *entity, char *answer, int n) {
 
 
     if (compare_token(intent, "who") == 0) {
 
 
-        char *crafted_response = calloc(n, sizeof(char));
+        char *crafted_answer = calloc(n, sizeof(char));
 
         if (who_intent->next != NULL) {
 
@@ -51,8 +51,8 @@ int knowledge_get(const char *intent, char *entity, char *response, int n) {
 
             if (head != NULL) {
 
-                strcat(crafted_response, head->answer);
-                snprintf(response, n, "%s", crafted_response);
+                strcat(crafted_answer, head->answer);
+                snprintf(answer, n, "%s", crafted_answer);
                 return KB_OK;
 
             } else {
@@ -68,7 +68,7 @@ int knowledge_get(const char *intent, char *entity, char *response, int n) {
     } else if (compare_token(intent, "what") == 0) {
 
 
-        char *crafted_response = calloc(n, sizeof(char));
+        char *crafted_answer = calloc(n, sizeof(char));
 
         if (what_intent->next != NULL) {
 
@@ -78,8 +78,8 @@ int knowledge_get(const char *intent, char *entity, char *response, int n) {
 
             if (head != NULL) {
 
-                strcat(crafted_response, head->answer);
-                snprintf(response, n, "%s", crafted_response);
+                strcat(crafted_answer, head->answer);
+                snprintf(answer, n, "%s", crafted_answer);
                 return KB_OK;
 
             } else {
@@ -93,7 +93,7 @@ int knowledge_get(const char *intent, char *entity, char *response, int n) {
 
 
     } else if (compare_token(intent, "where") == 0) {
-        char *crafted_response = calloc(n, sizeof(char));
+        char *crafted_answer = calloc(n, sizeof(char));
 
         if (where_intent->next != NULL) {
 
@@ -103,8 +103,8 @@ int knowledge_get(const char *intent, char *entity, char *response, int n) {
 
             if (head != NULL) {
 
-                strcat(crafted_response, head->answer);
-                snprintf(response, n, "%s", crafted_response);
+                strcat(crafted_answer, head->answer);
+                snprintf(answer, n, "%s", crafted_answer);
                 return KB_OK;
 
             } else {
@@ -140,15 +140,15 @@ int knowledge_get(const char *intent, char *entity, char *response, int n) {
  *   KB_NOMEM, if there was a memory allocation failure
  *   KB_INVALID, if the intent is not a valid question word
  */
-int knowledge_put(const char *intent, const char *entity, const char *response, int n) {
+int knowledge_put(const char *intent, const char *entity, const char *answer, int n) {
 
     /* to be implemented */
-    char user_response[MAX_INPUT];
+    char user_answer[MAX_INPUT];
 
-    prompt_user(user_response, n, "");
+    prompt_user(user_answer, n, "");
 
-    char *tempChar = calloc(strlen(user_response) + 1, sizeof(char));
-    strncpy(tempChar, user_response, sizeof(char) * strlen(user_response) + 1);
+    char *tempChar = calloc(strlen(user_answer) + 1, sizeof(char));
+    strncpy(tempChar, user_answer, sizeof(char) * strlen(user_answer) + 1);
 
 
     if (compare_token(intent, "who") == 0) {
@@ -198,46 +198,46 @@ int knowledge_put(const char *intent, const char *entity, const char *response, 
  */
 int knowledge_read(FILE *f) {
 
-	char line[MAX_INPUT];
+	char sentence[MAX_INPUT];
 	char delim[] = "=";
 	char name[MAX_INPUT], value[MAX_INPUT], *tokens[MAX_INPUT];;
 	int INTENT_FLAG = 0, linecount = 0;
 
-	while (fgets(line, sizeof line, f) != NULL) /* read a line */ {
+	while (fgets(sentence, sizeof sentence, f) != NULL) /* read a sentence */ {
 
 		int ERROR_FLAG = 1;
 
 
-		line[strcspn(line, "\n")] = 0;// Remove trailing newline
+		sentence[strcspn(sentence, "\n")] = 0;// Remove trailing newsentence
 
-		if (strcmp("[what]", line) == 0){
-			INTENT_FLAG = 1;// Indicate it is reading lines under the intent [What]
+		if (strcmp("[what]", sentence) == 0){
+			INTENT_FLAG = 1;// Indicate it is reading sentences under the intent [What]
 			continue;
 		}
-		if (strcmp("[where]", line) == 0){
-			INTENT_FLAG = 2;// Indicate it is reading lines under the intent [Where]
+		if (strcmp("[where]", sentence) == 0){
+			INTENT_FLAG = 2;// Indicate it is reading sentences under the intent [Where]
 			continue;
 		}
-		if (strcmp("[who]", line) == 0){
-			INTENT_FLAG = 3;// Indicate it is reading lines under the intent [Who]
+		if (strcmp("[who]", sentence) == 0){
+			INTENT_FLAG = 3;// Indicate it is reading sentences under the intent [Who]
 			continue;
 		}
 
-		// Checks if the delimiter '=' exists in line
-		for (int i = 0; i < strlen(line); i++) {
-			if (line[i] == '=') {
+		// Checks if the delimiter '=' exists in sentence
+		for (int i = 0; i < strlen(sentence); i++) {
+			if (sentence[i] == '=') {
 				ERROR_FLAG = 0;
 			}
 		}
-		if (strcmp("", line) == 0) {// Check if its a blank line
+		if (strcmp("", sentence) == 0) {// Check if its a blank sentence
 			ERROR_FLAG = 0;
 		}
 		else {
-			if (ERROR_FLAG == 1) {// Check if ERROR_FLAG is 1 (if delimiter does not exist in line)
-				return -1; // Returns -1 (num_of_lines in chatbot.c)
+			if (ERROR_FLAG == 1) {// Check if ERROR_FLAG is 1 (if delimiter does not exist in sentence)
+				return -1; // Returns -1 (num_of_sentences in chatbot.c)
 			}
-			// Separate line by the delimiter '='
-			tokens[0] = strtok(line, delim);// Get first part of split string
+			// Separate sentence by the delimiter '='
+			tokens[0] = strtok(sentence, delim);// Get first part of split string
 			tokens[1] = strtok(NULL, delim);// Get second part of split string
 
 			if ((tokens[0] != NULL) && (tokens[1] != NULL)) {// If there is a name/value that is NULL
