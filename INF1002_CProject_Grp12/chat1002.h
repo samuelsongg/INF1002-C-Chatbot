@@ -34,13 +34,13 @@
 
 /* data structures for intent and entities*/
 typedef struct node_struct{
-	char * entity_name;
-	char * answer;
+	char * entityName;
+	char * answers;
 	struct node_struct *next;
 } EntityNode;
 
 typedef struct {
-    char * intent_name;
+    char * intentName;
     EntityNode *next;
 } IntentNode;
 

@@ -23,3 +23,27 @@
 	<string.h>
 	"chat1002.h"
 
+1668657324 source:c:\users\h20ch\onedrive\documents\github\inf1002-c-chatbot\inf1002_cproject_grp12\main.c
+	<ctype.h>
+	<stdarg.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"chat1002.h"
+
+1669122598 c:\users\h20ch\onedrive\documents\github\inf1002-c-chatbot\inf1002_cproject_grp12\chat1002.h
+	<stdio.h>
+
+1669122434 source:c:\users\h20ch\onedrive\documents\github\inf1002-c-chatbot\inf1002_cproject_grp12\knowledge.c
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	"chat1002.h"
+
+1669122409 source:c:\users\h20ch\onedrive\documents\github\inf1002-c-chatbot\inf1002_cproject_grp12\chatbot.c
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<ctype.h>
+	"chat1002.h"
+

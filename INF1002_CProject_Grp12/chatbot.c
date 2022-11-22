@@ -84,26 +84,26 @@ const char *chatbot_username() {
  *   0, if the chatbot should continue chatting
  *   1, if the chatbot should stop (i.e. it detected the EXIT intent)
  */
-int chatbot_main(int numofwords, char *inv[], char *answer, int n) {
+int chatbot_main(int numofwords, char *inv[], char *answers, int n) {
 
 	/* check for empty input */
 	if (numofwords < 1) {
-		snprintf(answer, n, "");
+		snprintf(answers, n, "");
 		return 0;
 	}
 	/* look for an intent and invoke the corresponding do_* function */
 	if (chatbot_is_exit(inv[0]))
-		return chatbot_do_exit(numofwords, inv, answer, n);
+		return chatbot_do_exit(numofwords, inv, answers, n);
 	else if (chatbot_is_load(inv[0]))
-		return chatbot_do_load(numofwords, inv, answer, n);
+		return chatbot_do_load(numofwords, inv, answers, n);
 	else if (chatbot_is_question(inv[0]))
-        return  chatbot_do_question(numofwords, inv, answer, n);
+        return  chatbot_do_question(numofwords, inv, answers, n);
 	else if (chatbot_is_reset(inv[0]))
-		return chatbot_do_reset(numofwords, inv, answer, n);
+		return chatbot_do_reset(numofwords, inv, answers, n);
 	else if (chatbot_is_save(inv[0]))
-		return chatbot_do_save(numofwords, inv, answer, n);
+		return chatbot_do_save(numofwords, inv, answers, n);
 	else {
-		return chatbot_do_smalltalk(numofwords, inv, answer, n);
+		return chatbot_do_smalltalk(numofwords, inv, answers, n);
 	}
 
 }
@@ -135,9 +135,9 @@ int chatbot_is_exit(const char *intent) {
  * Returns:
  *   0 (the chatbot always continues chatting after a question)
  */
-int chatbot_do_exit(int numofwords, char *inv[], char *answer, int n) {
+int chatbot_do_exit(int numofwords, char *inv[], char *answers, int n) {
 
-	snprintf(answer, n, "Goodbye!");
+	snprintf(answers, n, "Goodbye World!");
 
 	return 1;
 
@@ -176,21 +176,21 @@ int chatbot_is_load(const char *intent) {
  * Returns:
  *   0 (the chatbot always continues chatting after loading knowledge)
  */
-int chatbot_do_load(int numofwords, char *inv[], char *answer, int n) {
+int chatbot_do_load(int numofwords, char *inv[], char *answers, int n) {
 
 	FILE* fileptr;
 	int numoflines = 0;
 
 	if ((fileptr = fopen(inv[1], "r")) == NULL) {// If input file cannot be found, it's NULL
-		snprintf(answer, n, "%s not found. Please try again!", inv[1]);
+		snprintf(answers, n, "%s not found. Please try again!", inv[1]);
 	}
 	else { // If file can be found
 		numoflines = knowledge_read(fileptr);
 		if (numoflines == -1) {// If there are invalid input in file
-			snprintf(answer, n, "Invalid file.");
+			snprintf(answers, n, "Invalid file.");
 		}
 		else {// Valid input in files
-			snprintf(answer, n, "Read %d responses from %s", numoflines, inv[1]);
+			snprintf(answers, n, "Read %d responses from %s", numoflines, inv[1]);
 		}
 	}
 	return 0;
@@ -233,7 +233,7 @@ int chatbot_is_question(const char *intent) {
  * Returns:
  *   0 (the chatbot always continues chatting after a question)
  */
-int chatbot_do_question(int numberofwords, char *inv[], char *answer, int n) {
+int chatbot_do_question(int numberofwords, char *inv[], char *answers, int n) {
 
 	//create crafted answer string
 	char * crafted_answer = calloc(n, sizeof(char));
@@ -292,7 +292,7 @@ int chatbot_do_question(int numberofwords, char *inv[], char *answer, int n) {
 
 
         //gets return value from knowledge bank
-        int knowledge_return = knowledge_get(inv[0], f_entity, answer, n);
+        int knowledge_return = knowledge_get(inv[0], f_entity, answers, n);
         switch (knowledge_return) {
             case KB_NOTFOUND: //if cannot find intent
                 strcat(answer_temp, chatbot_botname());
@@ -306,10 +306,10 @@ int chatbot_do_question(int numberofwords, char *inv[], char *answer, int n) {
 
 
 
-              int kout = knowledge_put(inv[0],f_entity,answer,n);
+              int kout = knowledge_put(inv[0],f_entity,answers,n);
 
                 strcat(crafted_answer, "Thank you"); //copy values to buffer
-                snprintf(answer, n, "%s", crafted_answer);
+                snprintf(answers, n, "%s", crafted_answer);
                 return kout;
 
 
@@ -324,7 +324,7 @@ int chatbot_do_question(int numberofwords, char *inv[], char *answer, int n) {
         return 0;
     }else{
 		strcat(crafted_answer, "Please include is/are in your question."); //copy values to buffer
-		snprintf(answer, n, "%s", crafted_answer); //put this to response
+		snprintf(answers, n, "%s", crafted_answer); //put this to response
 
 		return 0;
 	}
@@ -365,11 +365,11 @@ int chatbot_is_reset(const char *intent) {
  * Returns:
  *   0 (the chatbot always continues chatting after beign reset)
  */
-int chatbot_do_reset(int numofwords, char *inv[], char *answer, int n) {
+int chatbot_do_reset(int numofwords, char *inv[], char *answers, int n) {
 
 	knowledge_reset();
 	// Return print statement
-	snprintf(answer, n, "%s reset!", chatbot_botname());
+	snprintf(answers, n, "%s reset!", chatbot_botname());
 
 
 	return 0;
@@ -409,7 +409,7 @@ int chatbot_is_save(const char *intent) {
  * Returns:
  *   0 (the chatbot always continues chatting after saving knowledge)
  */
-int chatbot_do_save(int numofwords, char *inv[], char *answer, int n) {
+int chatbot_do_save(int numofwords, char *inv[], char *answers, int n) {
 
 	// int inc = number of words in user input = FILENAME
 	// char *inv[] = pointers to the beginning of each word of input = pointer to FILENAME
@@ -443,15 +443,15 @@ int chatbot_do_save(int numofwords, char *inv[], char *answer, int n) {
 	if (what_intent->next != NULL || who_intent->next != NULL || where_intent->next != NULL) {
 		f = fopen(filename, "w");
 		if (f == NULL) {
-			snprintf(answer, n, "Error opening file");
+			snprintf(answers, n, "Error opening file");
 			return 0;
 		}
 		knowledge_write(f);
-		snprintf(answer, n, "My knowledge has been saved to %s", filename);
+		snprintf(answers, n, "My knowledge has been saved to %s", filename);
 		fclose(f);
 	}
 	else {
-		snprintf(answer, n, "Knowledge base is empty! Please try again!");
+		snprintf(answers, n, "Knowledge Base is empty! Sad... Please try again!");
 		return 0;
 	}
 }
@@ -468,7 +468,7 @@ int chatbot_do_save(int numofwords, char *inv[], char *answer, int n) {
  *   0, if the chatbot should continue chatting
  *   1, if the chatbot ran out of responses for some reason (and should theoretically never come here)
  */
-int chatbot_do_smalltalk(int numofwords, char *inv[], char *answer, int n) {
+int chatbot_do_smalltalk(int numofwords, char *inv[], char *answers, int n) {
 
 	/* Initialize local variables to be used*/
 	int index_of_word; //index of word found in inv
@@ -525,7 +525,7 @@ int chatbot_do_smalltalk(int numofwords, char *inv[], char *answer, int n) {
 	}
 
 
-	snprintf(answer, n, "%s", crafted_answer); //put this to response
+	snprintf(answers, n, "%s", crafted_answer); //put this to response
 
 	replycount[index_of_keyword]++; //increment to get a different response from same category
 

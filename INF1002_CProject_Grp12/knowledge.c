@@ -35,7 +35,7 @@
  *   KB_NOTFOUND, if no response could be found
  *   KB_INVALID, if 'intent' is not a recognised question word
  */
-int knowledge_get(const char *intent, char *entity, char *answer, int n) {
+int knowledge_get(const char *intent, char *entity, char *answers, int n) {
 
 
     if (compare_token(intent, "who") == 0) {
@@ -51,8 +51,8 @@ int knowledge_get(const char *intent, char *entity, char *answer, int n) {
 
             if (head != NULL) {
 
-                strcat(crafted_answer, head->answer);
-                snprintf(answer, n, "%s", crafted_answer);
+                strcat(crafted_answer, head->answers);
+                snprintf(answers, n, "%s", crafted_answer);
                 return KB_OK;
 
             } else {
@@ -78,8 +78,8 @@ int knowledge_get(const char *intent, char *entity, char *answer, int n) {
 
             if (head != NULL) {
 
-                strcat(crafted_answer, head->answer);
-                snprintf(answer, n, "%s", crafted_answer);
+                strcat(crafted_answer, head->answers);
+                snprintf(answers, n, "%s", crafted_answer);
                 return KB_OK;
 
             } else {
@@ -103,8 +103,8 @@ int knowledge_get(const char *intent, char *entity, char *answer, int n) {
 
             if (head != NULL) {
 
-                strcat(crafted_answer, head->answer);
-                snprintf(answer, n, "%s", crafted_answer);
+                strcat(crafted_answer, head->answers);
+                snprintf(answers, n, "%s", crafted_answer);
                 return KB_OK;
 
             } else {
@@ -301,8 +301,8 @@ void knowledge_reset() {
 			EntityNode *temp = head;
 			while (temp != NULL) {
 				temp = temp->next;
-				free(head->entity_name);
-				free(head->answer);
+				free(head->entityName);
+				free(head->answers);
 				free(head);
 				head = temp;
 
@@ -318,8 +318,8 @@ void knowledge_reset() {
 			EntityNode *temp = head;
 			while (head != NULL) {
 				temp = temp->next;
-				free(head->entity_name);
-				free(head->answer);
+				free(head->entityName);
+				free(head->answers);
 				free(head);
 				head = temp;
 			}
@@ -334,8 +334,8 @@ void knowledge_reset() {
 			EntityNode *temp = head;
 			while (temp != NULL) {
 				temp = temp->next;
-				free(head->entity_name);
-				free(head->answer);
+				free(head->entityName);
+				free(head->answers);
 				free(head);
 				head = temp;
 			}
@@ -357,13 +357,13 @@ void knowledge_write(FILE *f) {
 
 	// What Intent List
 	IntentNode *intent1 = what_intent;
-	fprintf(f, "[%s]\n", intent1->intent_name);
+	fprintf(f, "[%s]\n", intent1->intentName);
 
 	EntityNode *entity1 = what_intent->next;
 	while (entity1 != NULL) {
-		fprintf(f, entity1->entity_name);
+		fprintf(f, entity1->entityName);
 		fprintf(f, "=");
-		fprintf(f, entity1->answer);
+		fprintf(f, entity1->answers);
 		fprintf(f, "\n");
 		entity1 = entity1->next;
 	}
@@ -371,13 +371,13 @@ void knowledge_write(FILE *f) {
 
 	// Where Intent List
 	IntentNode *intent2 = where_intent;
-	fprintf(f, "[%s]\n", intent2->intent_name);
+	fprintf(f, "[%s]\n", intent2->intentName);
 
 	EntityNode *entity2 = where_intent->next;
 	while (entity2 != NULL) {
-		fprintf(f, entity2->entity_name);
+		fprintf(f, entity2->entityName);
 		fprintf(f, "=");
-		fprintf(f, entity2->answer);
+		fprintf(f, entity2->answers);
 		fprintf(f, "\n");
 		entity2 = entity2->next;
 	}
@@ -385,13 +385,13 @@ void knowledge_write(FILE *f) {
 
 	// Who Intent List
 	IntentNode *intent3 = who_intent;
-	fprintf(f, "[%s]\n", intent3->intent_name);
+	fprintf(f, "[%s]\n", intent3->intentName);
 
 	EntityNode *entity3 = who_intent->next;
 	while (entity3 != NULL) {
-		fprintf(f, entity3->entity_name);
+		fprintf(f, entity3->entityName);
 		fprintf(f, "=");
-		fprintf(f, entity3->answer);
+		fprintf(f, entity3->answers);
 		fprintf(f, "\n");
 		entity3 = entity3->next;
 	}
@@ -412,8 +412,8 @@ void init_intentnodes() {
         printf("Memory is full.");
         exit(1);
     }
-    who_intent->intent_name = calloc(4, sizeof(char)); //got to malloc the string pointer first
-    strncpy(who_intent->intent_name, "who", sizeof(char) * 4);
+    who_intent->intentName = calloc(4, sizeof(char)); //got to malloc the string pointer first
+    strncpy(who_intent->intentName, "who", sizeof(char) * 4);
     who_intent->next = NULL;
 
     //init of what intent
@@ -422,8 +422,8 @@ void init_intentnodes() {
         printf("Memory is full.");
         exit(1);
     }
-    what_intent->intent_name = calloc(5, sizeof(char)); //got to malloc the string pointer first
-    strncpy(what_intent->intent_name, "what", sizeof(char) * 5);
+    what_intent->intentName = calloc(5, sizeof(char)); //got to malloc the string pointer first
+    strncpy(what_intent->intentName, "what", sizeof(char) * 5);
     what_intent->next = NULL;
 
     //init of where intent
@@ -432,8 +432,8 @@ void init_intentnodes() {
         printf("Memory is full.");
         exit(1);
     }
-    where_intent->intent_name = calloc(6, sizeof(char)); //got to malloc the string pointer first
-    strncpy(where_intent->intent_name, "where", sizeof(char) * 6);
+    where_intent->intentName = calloc(6, sizeof(char)); //got to malloc the string pointer first
+    strncpy(where_intent->intentName, "where", sizeof(char) * 6);
     where_intent->next = NULL;
 
 }
@@ -448,8 +448,8 @@ void init_intentnodes() {
 EntityNode *Entitysearch_list(EntityNode *head, char *target) {
     EntityNode *temp = head;
     while (temp != NULL) { //while head not null
-		if (temp->entity_name != NULL) {
-			if (compare_token(temp->entity_name, target) != 0) { //while the value of the not-null temp is not the same
+		if (temp->entityName != NULL) {
+			if (compare_token(temp->entityName, target) != 0) { //while the value of the not-null temp is not the same
 				temp = temp->next; //iterate through linked list
 			}
 			else {
@@ -466,11 +466,11 @@ EntityNode *EntityCreate_node(char *entity, char *ans) {
     EntityNode *new_node = (EntityNode *) malloc(sizeof(EntityNode));
 
     if (new_node != NULL) {
-        new_node->entity_name = calloc(strlen(entity) + 1, sizeof(char));
-        new_node->answer = calloc(strlen(ans) + 1, sizeof(char));
+        new_node->entityName = calloc(strlen(entity) + 1, sizeof(char));
+        new_node->answers = calloc(strlen(ans) + 1, sizeof(char));
 
-        strncpy(new_node->entity_name, entity, sizeof(char) * strlen(entity) + 1);
-        strncpy(new_node->answer, ans, sizeof(char) * strlen(ans) + 1);
+        strncpy(new_node->entityName, entity, sizeof(char) * strlen(entity) + 1);
+        strncpy(new_node->answers, ans, sizeof(char) * strlen(ans) + 1);
         new_node->next = NULL;
     }
     return new_node;
